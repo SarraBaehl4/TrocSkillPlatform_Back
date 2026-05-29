@@ -68,8 +68,8 @@ public class AuthController {
             e.printStackTrace();
             return ResponseEntity.status(500)
                 .body(Map.of("error", "Erreur lors de l'inscription"));
-        }
     }
+}
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> body, HttpServletResponse response) {
