@@ -48,13 +48,11 @@ class KnowledgeServiceTest {
         Knowledge knowledge1 = new Knowledge();
         knowledge1.setId(1L);
         knowledge1.setName("Java");
-        knowledge1.setLevel("Expert");
         knowledge1.setCategoryId(10L);  // Catégorie Informatique
 
         Knowledge knowledge2 = new Knowledge();
         knowledge2.setId(2L);
         knowledge2.setName("Pâtisserie");
-        knowledge2.setLevel("Intermediate");
         knowledge2.setCategoryId(15L);  // Catégorie Cuisine
 
         List<Knowledge> knowledges = Arrays.asList(knowledge1, knowledge2);
@@ -62,13 +60,11 @@ class KnowledgeServiceTest {
         KnowledgeDTO dto1 = new KnowledgeDTO();
         dto1.setId(1L);
         dto1.setName("Java");
-        dto1.setLevel("Expert");
         dto1.setCategoryId(10L);
 
         KnowledgeDTO dto2 = new KnowledgeDTO();
         dto2.setId(2L);
         dto2.setName("Pâtisserie");
-        dto2.setLevel("Intermediate");
         dto2.setCategoryId(15L);
 
         List<KnowledgeDTO> expectedDTOs = Arrays.asList(dto1, dto2);
@@ -138,13 +134,11 @@ class KnowledgeServiceTest {
         Knowledge knowledge = new Knowledge();
         knowledge.setId(knowledgeId);
         knowledge.setName("Spring Boot");
-        knowledge.setLevel("Advanced");
         knowledge.setCategoryId(10L);  // Catégorie Informatique
 
         KnowledgeDTO expectedDTO = new KnowledgeDTO();
         expectedDTO.setId(knowledgeId);
         expectedDTO.setName("Spring Boot");
-        expectedDTO.setLevel("Advanced");
         expectedDTO.setCategoryId(10L);
 
         when(knowledgeRepository.findById(knowledgeId)).thenReturn(Optional.of(knowledge));
@@ -157,7 +151,6 @@ class KnowledgeServiceTest {
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(knowledgeId);
         assertThat(result.getName()).isEqualTo("Spring Boot");
-        assertThat(result.getLevel()).isEqualTo("Advanced");
         assertThat(result.getCategoryId()).isEqualTo(10L);
 
         verify(knowledgeRepository, times(1)).findById(knowledgeId);
@@ -203,24 +196,20 @@ class KnowledgeServiceTest {
         // Arrange
         KnowledgeDTO inputDTO = new KnowledgeDTO();
         inputDTO.setName("Docker");
-        inputDTO.setLevel("Beginner");
         inputDTO.setCategoryId(10L);  // Catégorie Informatique
 
         Knowledge entityToSave = new Knowledge();
         entityToSave.setName("Docker");
-        entityToSave.setLevel("Beginner");
         entityToSave.setCategoryId(10L);
 
         Knowledge savedEntity = new Knowledge();
         savedEntity.setId(1L);
         savedEntity.setName("Docker");
-        savedEntity.setLevel("Beginner");
         savedEntity.setCategoryId(10L);
 
         KnowledgeDTO expectedDTO = new KnowledgeDTO();
         expectedDTO.setId(1L);
         expectedDTO.setName("Docker");
-        expectedDTO.setLevel("Beginner");
         expectedDTO.setCategoryId(10L);
 
         when(knowledgeMapper.toEntity(inputDTO)).thenReturn(entityToSave);
@@ -234,7 +223,6 @@ class KnowledgeServiceTest {
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(1L);
         assertThat(result.getName()).isEqualTo("Docker");
-        assertThat(result.getLevel()).isEqualTo("Beginner");
         assertThat(result.getCategoryId()).isEqualTo(10L);
 
         verify(knowledgeMapper, times(1)).toEntity(inputDTO);
@@ -275,7 +263,6 @@ class KnowledgeServiceTest {
         // Arrange
         KnowledgeDTO inputDTO = new KnowledgeDTO();
         inputDTO.setName("Yoga");
-        inputDTO.setLevel("Intermediate");
         inputDTO.setCategoryId(20L);  // Catégorie Sport
 
         Knowledge entity = new Knowledge();
@@ -307,25 +294,21 @@ class KnowledgeServiceTest {
         Long knowledgeId = 1L;
         KnowledgeDTO inputDTO = new KnowledgeDTO();
         inputDTO.setName("React Updated");
-        inputDTO.setLevel("Expert");
         inputDTO.setCategoryId(10L);  // Catégorie Informatique
 
         Knowledge existingKnowledge = new Knowledge();
         existingKnowledge.setId(knowledgeId);
         existingKnowledge.setName("React");
-        existingKnowledge.setLevel("Intermediate");
         existingKnowledge.setCategoryId(10L);
 
         Knowledge updatedEntity = new Knowledge();
         updatedEntity.setId(knowledgeId);
         updatedEntity.setName("React Updated");
-        updatedEntity.setLevel("Expert");
         updatedEntity.setCategoryId(10L);
 
         KnowledgeDTO expectedDTO = new KnowledgeDTO();
         expectedDTO.setId(knowledgeId);
         expectedDTO.setName("React Updated");
-        expectedDTO.setLevel("Expert");
         expectedDTO.setCategoryId(10L);
 
         when(knowledgeRepository.findById(knowledgeId)).thenReturn(Optional.of(existingKnowledge));
@@ -339,7 +322,6 @@ class KnowledgeServiceTest {
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(knowledgeId);
         assertThat(result.getName()).isEqualTo("React Updated");
-        assertThat(result.getLevel()).isEqualTo("Expert");
         assertThat(result.getCategoryId()).isEqualTo(10L);
 
         verify(knowledgeRepository, times(1)).findById(knowledgeId);
@@ -373,13 +355,11 @@ class KnowledgeServiceTest {
         Long knowledgeId = 2L;
         KnowledgeDTO inputDTO = new KnowledgeDTO();
         inputDTO.setName("Vue.js");
-        inputDTO.setLevel("Advanced");
         inputDTO.setCategoryId(10L);  // Catégorie Informatique
 
         Knowledge existingKnowledge = new Knowledge();
         existingKnowledge.setId(knowledgeId);
         existingKnowledge.setName("Old Name");
-        existingKnowledge.setLevel("Old Level");
         existingKnowledge.setCategoryId(15L);  // Ancienne catégorie Cuisine
 
         Knowledge updatedEntity = new Knowledge();
@@ -394,7 +374,6 @@ class KnowledgeServiceTest {
 
         // Assert
         assertThat(existingKnowledge.getName()).isEqualTo("Vue.js");
-        assertThat(existingKnowledge.getLevel()).isEqualTo("Advanced");
         assertThat(existingKnowledge.getCategoryId()).isEqualTo(10L);
 
         verify(knowledgeRepository, times(1)).save(existingKnowledge);
@@ -432,13 +411,11 @@ class KnowledgeServiceTest {
         Long knowledgeId = 7L;
         KnowledgeDTO inputDTO = new KnowledgeDTO();
         inputDTO.setName("Course à pied");
-        inputDTO.setLevel("Intermediate");
         inputDTO.setCategoryId(20L);  // Nouvelle catégorie Sport
 
         Knowledge existingKnowledge = new Knowledge();
         existingKnowledge.setId(knowledgeId);
         existingKnowledge.setName("Course à pied");
-        existingKnowledge.setLevel("Beginner");
         existingKnowledge.setCategoryId(10L);  // Ancienne catégorie Informatique (erreur)
 
         Knowledge updatedEntity = new Knowledge();

@@ -19,9 +19,6 @@ public class Knowledge {
     @Column(name = "name")
     private String name;
     
-    @Column(name = "level")
-    private String level;
-    
     @Column(name = "category_id")
     private Long categoryId;
 }

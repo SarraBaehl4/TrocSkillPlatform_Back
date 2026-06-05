@@ -40,13 +40,11 @@ class KnowledgeControllerTest {
         KnowledgeDTO knowledge1 = new KnowledgeDTO();
         knowledge1.setId(1L);
         knowledge1.setName("Java");
-        knowledge1.setLevel("Expert");
         knowledge1.setCategoryId(1L);
 
         KnowledgeDTO knowledge2 = new KnowledgeDTO();
         knowledge2.setId(2L);
         knowledge2.setName("Python");
-        knowledge2.setLevel("Intermediate");
         knowledge2.setCategoryId(2L);
 
         List<KnowledgeDTO> mockKnowledges = Arrays.asList(knowledge1, knowledge2);
@@ -88,7 +86,6 @@ class KnowledgeControllerTest {
         KnowledgeDTO mockKnowledge = new KnowledgeDTO();
         mockKnowledge.setId(knowledgeId);
         mockKnowledge.setName("Spring Boot");
-        mockKnowledge.setLevel("Advanced");
         mockKnowledge.setCategoryId(3L);
 
         when(knowledgeService.getKnowledgeById(knowledgeId)).thenReturn(mockKnowledge);
@@ -102,7 +99,6 @@ class KnowledgeControllerTest {
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getId()).isEqualTo(knowledgeId);
         assertThat(response.getBody().getName()).isEqualTo("Spring Boot");
-        assertThat(response.getBody().getLevel()).isEqualTo("Advanced");
         verify(knowledgeService, times(1)).getKnowledgeById(knowledgeId);
     }
 
@@ -129,13 +125,11 @@ class KnowledgeControllerTest {
         // Arrange
         KnowledgeDTO inputKnowledge = new KnowledgeDTO();
         inputKnowledge.setName("Docker");
-        inputKnowledge.setLevel("Beginner");
         inputKnowledge.setCategoryId(4L);
 
         KnowledgeDTO createdKnowledge = new KnowledgeDTO();
         createdKnowledge.setId(1L);
         createdKnowledge.setName("Docker");
-        createdKnowledge.setLevel("Beginner");
         createdKnowledge.setCategoryId(4L);
 
         when(knowledgeService.createKnowledge(any(KnowledgeDTO.class))).thenReturn(createdKnowledge);
@@ -149,7 +143,6 @@ class KnowledgeControllerTest {
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getId()).isEqualTo(1L);
         assertThat(response.getBody().getName()).isEqualTo("Docker");
-        assertThat(response.getBody().getLevel()).isEqualTo("Beginner");
         verify(knowledgeService, times(1)).createKnowledge(inputKnowledge);
     }
 
@@ -158,7 +151,6 @@ class KnowledgeControllerTest {
         // Arrange
         KnowledgeDTO knowledgeDTO = new KnowledgeDTO();
         knowledgeDTO.setName("Kubernetes");
-        knowledgeDTO.setLevel("Intermediate");
         knowledgeDTO.setCategoryId(5L);
 
         KnowledgeDTO createdKnowledge = new KnowledgeDTO();
@@ -182,13 +174,11 @@ class KnowledgeControllerTest {
         Long knowledgeId = 1L;
         KnowledgeDTO inputKnowledge = new KnowledgeDTO();
         inputKnowledge.setName("React");
-        inputKnowledge.setLevel("Advanced");
         inputKnowledge.setCategoryId(6L);
 
         KnowledgeDTO updatedKnowledge = new KnowledgeDTO();
         updatedKnowledge.setId(knowledgeId);
         updatedKnowledge.setName("React");
-        updatedKnowledge.setLevel("Advanced");
         updatedKnowledge.setCategoryId(6L);
 
         when(knowledgeService.updateKnowledge(eq(knowledgeId), any(KnowledgeDTO.class)))
@@ -203,7 +193,6 @@ class KnowledgeControllerTest {
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getId()).isEqualTo(knowledgeId);
         assertThat(response.getBody().getName()).isEqualTo("React");
-        assertThat(response.getBody().getLevel()).isEqualTo("Advanced");
         verify(knowledgeService, times(1)).updateKnowledge(knowledgeId, inputKnowledge);
     }
 
@@ -213,7 +202,6 @@ class KnowledgeControllerTest {
         Long knowledgeId = 3L;
         KnowledgeDTO knowledgeDTO = new KnowledgeDTO();
         knowledgeDTO.setName("Vue.js");
-        knowledgeDTO.setLevel("Expert");
         knowledgeDTO.setCategoryId(7L);
 
         KnowledgeDTO updatedKnowledge = new KnowledgeDTO();
@@ -234,13 +222,11 @@ class KnowledgeControllerTest {
         Long knowledgeId = 10L;
         KnowledgeDTO inputKnowledge = new KnowledgeDTO();
         inputKnowledge.setName("Angular");
-        inputKnowledge.setLevel("Beginner");
         inputKnowledge.setCategoryId(8L);
 
         KnowledgeDTO updatedKnowledge = new KnowledgeDTO();
         updatedKnowledge.setId(knowledgeId);
         updatedKnowledge.setName("Angular");
-        updatedKnowledge.setLevel("Beginner");
         updatedKnowledge.setCategoryId(8L);
 
         when(knowledgeService.updateKnowledge(knowledgeId, inputKnowledge)).thenReturn(updatedKnowledge);
@@ -252,7 +238,6 @@ class KnowledgeControllerTest {
         assertThat(response.getBody())
             .extracting(
                 KnowledgeDTO::getName,
-                KnowledgeDTO::getLevel,
                 KnowledgeDTO::getCategoryId
             )
             .containsExactly("Angular", "Beginner", 8L);
