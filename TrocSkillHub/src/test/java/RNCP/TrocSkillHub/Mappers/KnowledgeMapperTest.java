@@ -69,7 +69,7 @@ class KnowledgeMapperTest {
                 KnowledgeDTO::getName,
                 KnowledgeDTO::getCategoryId
             )
-            .containsExactly(99L, "Python", "Intermediate", 5L);
+            .containsExactly(99L, "Python", 5L);
     }
 
     @Test
@@ -138,7 +138,7 @@ class KnowledgeMapperTest {
                 Knowledge::getName,
                 Knowledge::getCategoryId
             )
-            .containsExactly(50L, "Docker", "Beginner", 7L);
+            .containsExactly(50L, "Docker", 7L);
     }
 
     @Test

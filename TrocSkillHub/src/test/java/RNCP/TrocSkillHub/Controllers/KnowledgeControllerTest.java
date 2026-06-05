@@ -240,7 +240,7 @@ class KnowledgeControllerTest {
                 KnowledgeDTO::getName,
                 KnowledgeDTO::getCategoryId
             )
-            .containsExactly("Angular", "Beginner", 8L);
+            .containsExactly("Angular", 8L);
     }
 
     // ========== Tests pour deleteKnowledge() ==========
