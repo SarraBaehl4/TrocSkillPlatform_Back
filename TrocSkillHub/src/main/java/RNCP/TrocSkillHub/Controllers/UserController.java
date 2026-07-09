@@ -1,6 +1,7 @@
 package RNCP.TrocSkillHub.Controllers;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,7 +27,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 @CrossOrigin(origins = "http://localhost:5173")
 public class UserController {
 
-    
+
     private final UserService userService;
     private final UserMapper userMapper;
 
@@ -36,24 +37,26 @@ public class UserController {
         this.userMapper = userMapper;
     }
 
-    // Récuperer tous les utilisateurs 
-     @GetMapping
+    // Récuperer tous les utilisateurs (avec compétences et besoins)
+    @GetMapping
     public ResponseEntity<List<UserDTO>> getAllUsers() {
         List<User> users = userService.getAllUsers();
-        List<UserDTO> userDTOs = userMapper.toDTOList(users);
+        List<UserDTO> userDTOs = users.stream()
+                .map(userService::buildUserDTO)
+                .collect(Collectors.toList());
         return ResponseEntity.ok(userDTOs);
     }
 
-    // Récuperer les données utilisateur à partir d'un id
+    // Récuperer les données utilisateur à partir d'un id (avec compétences et besoins)
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
         return userService.getUserById(id)
-                .map(user -> ResponseEntity.ok(userMapper.toDTO(user)))
+                .map(user -> ResponseEntity.ok(userService.buildUserDTO(user)))
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(null));
     }
 
-    
+
     // Créer un utilisateur
     @PostMapping
     public ResponseEntity<?> createUser(@RequestBody UserDTO userDTO) {
@@ -93,7 +96,5 @@ public class UserController {
                     .body("Erreur: " + e.getMessage());
         }
     }
-
-
 
 }

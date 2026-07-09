@@ -53,18 +53,21 @@ public class UserControllerTest {
             1L,
             "John",
             "Doe",
-            "test@example.com", 
+            "test@example.com",
             "password123",
             null,
-            null, 
-            null,                   
-            null,                   
             null,
             null,
             null,
-            null                 
+            null,
+            null,
+            null,
+            null,
+            Collections.emptyList(),
+            Collections.emptyList()
         );
     }
+
     // ========== GET ALL USERS ==========
 
     @Test
@@ -72,30 +75,27 @@ public class UserControllerTest {
     void getAllUsers_shouldReturnUserList() {
 
         List<User> users = Arrays.asList(user);
-        List<UserDTO> userDTOs = Arrays.asList(userDTO);
 
         when(userService.getAllUsers()).thenReturn(users);
-        when(userMapper.toDTOList(users)).thenReturn(userDTOs);
+        when(userService.buildUserDTO(user)).thenReturn(userDTO);
 
         ResponseEntity<List<UserDTO>> response = userController.getAllUsers();
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).hasSize(1);
-        assertThat(response.getBody().get(0).email()).isEqualTo("test@example.com");
+        assertThat(response.getBody().get(0).getEmail()).isEqualTo("test@example.com");
     }
+
     @Test
     @DisplayName("getAllUsers - should return empty list when no users")
     void getAllUsers_shouldReturnEmptyList_whenNoUsers() {
-    when(userService.getAllUsers()).thenReturn(Collections.emptyList());
-    when(userMapper.toDTOList(Collections.emptyList())).thenReturn(Collections.emptyList());
+        when(userService.getAllUsers()).thenReturn(Collections.emptyList());
 
-    ResponseEntity<List<UserDTO>> response = userController.getAllUsers();
+        ResponseEntity<List<UserDTO>> response = userController.getAllUsers();
 
-    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    assertThat(response.getBody()).isEmpty();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isEmpty();
     }
-
-    
 
     // ========== GET USER BY ID ==========
 
@@ -104,7 +104,7 @@ public class UserControllerTest {
     void getUserById_shouldReturnUser_whenUserExists() {
 
         when(userService.getUserById(1L)).thenReturn(Optional.of(user));
-        when(userMapper.toDTO(user)).thenReturn(userDTO);
+        when(userService.buildUserDTO(user)).thenReturn(userDTO);
 
         ResponseEntity<?> response = userController.getUserById(1L);
 

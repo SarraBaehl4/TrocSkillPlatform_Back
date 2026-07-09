@@ -1,5 +1,6 @@
 package RNCP.TrocSkillHub.Services;
 
+import RNCP.TrocSkillHub.DTOs.UserDTO;
 import RNCP.TrocSkillHub.Models.User;
 
 import java.util.List;
@@ -19,5 +20,6 @@ public interface UserService {
     boolean existsByEmail(String email);
     List<User> getUsersByCity(String city);
     List<User> getUsersByCountry(String country);
+    UserDTO buildUserDTO(User user);
     
 }
