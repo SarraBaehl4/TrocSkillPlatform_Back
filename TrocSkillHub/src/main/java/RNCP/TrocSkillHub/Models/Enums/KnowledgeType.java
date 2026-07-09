@@ -1,6 +1,6 @@
 package RNCP.TrocSkillHub.Models.Enums;
 
-public class KnowledgeType {
+public enum KnowledgeType {
     SKILL,
     NEED
 }
