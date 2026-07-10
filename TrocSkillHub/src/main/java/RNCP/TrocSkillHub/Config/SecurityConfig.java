@@ -53,6 +53,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.DELETE, "/api/knowledges/{id}").authenticated()
 
                 .requestMatchers(HttpMethod.GET, "/api/users/cards").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/avatars").permitAll()
             
                 // Endpoints users (authentifiés)
                 .requestMatchers(HttpMethod.POST, "/api/users").authenticated()

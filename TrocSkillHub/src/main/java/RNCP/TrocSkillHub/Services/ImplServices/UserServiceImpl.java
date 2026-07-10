@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
@@ -15,7 +14,6 @@ import org.springframework.data.domain.Pageable;
 import RNCP.TrocSkillHub.DTOs.UserCardDTO;
 import RNCP.TrocSkillHub.DTOs.UserDTO;
 import RNCP.TrocSkillHub.DTOs.UserKnowledgeDTO;
-import RNCP.TrocSkillHub.DTOs.UserCardDTO;
 import RNCP.TrocSkillHub.Mappers.UserKnowledgeMapper;
 import RNCP.TrocSkillHub.Mappers.UserMapper;
 import RNCP.TrocSkillHub.Models.Enums.KnowledgeType;
@@ -27,6 +25,9 @@ import RNCP.TrocSkillHub.Services.UserService;
 
 @Service
 public class UserServiceImpl implements UserService {
+
+    private static final String DICEBEAR_ADVENTURER_URL = "https://api.dicebear.com/9.x/adventurer/svg?seed=";
+    private static final String DICEBEAR_INITIALS_URL = "https://api.dicebear.com/9.x/initials/svg?seed=";
 
     private final UserRepository userRepository;
     private final UserKnowledgeRepository userKnowledgeRepository;
@@ -97,7 +98,6 @@ public class UserServiceImpl implements UserService {
                     existingUser.setLastName(user.getLastName());
                     existingUser.setAddress(user.getAddress());
                     existingUser.setEmail(user.getEmail());
-                    existingUser.setPicture(user.getPicture());
                     existingUser.setCity(user.getCity());
                     existingUser.setCountry(user.getCountry());
                     existingUser.setPhoneNumber(user.getPhoneNumber());
@@ -167,9 +167,17 @@ public class UserServiceImpl implements UserService {
         UserCardDTO card = new UserCardDTO();
         card.setId(fullDTO.getId());
         card.setPseudo(fullDTO.getFirstName() + " " + fullDTO.getLastName());
-        card.setPictureUrl("/api/users/" + fullDTO.getId() + "/picture");
+        card.setPictureUrl(buildPictureUrl(user));
         card.setCompetences(fullDTO.getCompetences());
         card.setBesoins(fullDTO.getBesoins());
         return card;
+    }
+
+    private String buildPictureUrl(User user) {
+        if (user.getAvatarId() != null) {
+            return DICEBEAR_ADVENTURER_URL + user.getAvatarId();
+        }
+        String pseudo = user.getFirstName() + " " + user.getLastName();
+        return DICEBEAR_INITIALS_URL + pseudo;
     }
 }
