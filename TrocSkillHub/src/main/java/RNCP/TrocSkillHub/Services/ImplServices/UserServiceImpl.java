@@ -5,11 +5,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import RNCP.TrocSkillHub.DTOs.UserCardDTO;
 import RNCP.TrocSkillHub.DTOs.UserDTO;
 import RNCP.TrocSkillHub.DTOs.UserKnowledgeDTO;
+import RNCP.TrocSkillHub.DTOs.UserCardDTO;
 import RNCP.TrocSkillHub.Mappers.UserKnowledgeMapper;
 import RNCP.TrocSkillHub.Mappers.UserMapper;
 import RNCP.TrocSkillHub.Models.Enums.KnowledgeType;
@@ -29,10 +35,10 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     public UserServiceImpl(UserRepository userRepository,
-                            UserKnowledgeRepository userKnowledgeRepository,
-                            UserMapper userMapper,
-                            UserKnowledgeMapper userKnowledgeMapper,
-                            PasswordEncoder passwordEncoder) {
+            UserKnowledgeRepository userKnowledgeRepository,
+            UserMapper userMapper,
+            UserKnowledgeMapper userKnowledgeMapper,
+            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userKnowledgeRepository = userKnowledgeRepository;
         this.userMapper = userMapper;
@@ -86,20 +92,20 @@ public class UserServiceImpl implements UserService {
     @Override
     public User updateUser(Long id, User user) {
         return userRepository.findById(id)
-            .map(existingUser -> {
-                existingUser.setFirstName(user.getFirstName());
-                existingUser.setLastName(user.getLastName());
-                existingUser.setAddress(user.getAddress());
-                existingUser.setEmail(user.getEmail());
-                existingUser.setPicture(user.getPicture());
-                existingUser.setCity(user.getCity());
-                existingUser.setCountry(user.getCountry());
-                existingUser.setPhoneNumber(user.getPhoneNumber());
-                existingUser.setDescription(user.getDescription());
-                existingUser.setUpdatedAt(LocalDate.now());
-                return userRepository.save(existingUser);
-            })
-            .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec l'id: " + id));
+                .map(existingUser -> {
+                    existingUser.setFirstName(user.getFirstName());
+                    existingUser.setLastName(user.getLastName());
+                    existingUser.setAddress(user.getAddress());
+                    existingUser.setEmail(user.getEmail());
+                    existingUser.setPicture(user.getPicture());
+                    existingUser.setCity(user.getCity());
+                    existingUser.setCountry(user.getCountry());
+                    existingUser.setPhoneNumber(user.getPhoneNumber());
+                    existingUser.setDescription(user.getDescription());
+                    existingUser.setUpdatedAt(LocalDate.now());
+                    return userRepository.save(existingUser);
+                })
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec l'id: " + id));
     }
 
     @Override
@@ -146,5 +152,24 @@ public class UserServiceImpl implements UserService {
         if (!password.matches(".*[@#$%^&+=!?*].*")) {
             throw new RuntimeException("Le mot de passe doit contenir au moins un caractère spécial (@#$%^&+=!?*)");
         }
+    }
+
+    @Override
+    public Page<UserCardDTO> getUserCards(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<User> users = userRepository.findAllWithAtLeastOneSkill(KnowledgeType.SKILL, pageable);
+        return users.map(this::toUserCardDTO);
+    }
+
+    private UserCardDTO toUserCardDTO(User user) {
+        UserDTO fullDTO = buildUserDTO(user);
+
+        UserCardDTO card = new UserCardDTO();
+        card.setId(fullDTO.getId());
+        card.setPseudo(fullDTO.getFirstName() + " " + fullDTO.getLastName());
+        card.setPictureUrl("/api/users/" + fullDTO.getId() + "/picture");
+        card.setCompetences(fullDTO.getCompetences());
+        card.setBesoins(fullDTO.getBesoins());
+        return card;
     }
 }

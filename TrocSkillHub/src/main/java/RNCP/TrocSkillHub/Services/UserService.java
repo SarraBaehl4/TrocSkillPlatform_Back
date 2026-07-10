@@ -1,10 +1,13 @@
 package RNCP.TrocSkillHub.Services;
 
 import RNCP.TrocSkillHub.DTOs.UserDTO;
+import RNCP.TrocSkillHub.DTOs.UserCardDTO;
 import RNCP.TrocSkillHub.Models.User;
 
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.data.domain.Page;
 
 public interface UserService {
 
@@ -21,5 +24,6 @@ public interface UserService {
     List<User> getUsersByCity(String city);
     List<User> getUsersByCountry(String country);
     UserDTO buildUserDTO(User user);
+    Page<UserCardDTO> getUserCards(int page, int size);
     
 }
