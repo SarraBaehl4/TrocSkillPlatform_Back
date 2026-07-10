@@ -51,6 +51,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/knowledges").authenticated()
                 .requestMatchers(HttpMethod.PUT, "/api/knowledges/{id}").authenticated()
                 .requestMatchers(HttpMethod.DELETE, "/api/knowledges/{id}").authenticated()
+
+                .requestMatchers(HttpMethod.GET, "/api/users/cards").permitAll()
             
                 // Endpoints users (authentifiés)
                 .requestMatchers(HttpMethod.POST, "/api/users").authenticated()
