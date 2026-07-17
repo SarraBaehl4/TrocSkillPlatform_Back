@@ -19,6 +19,8 @@ public class UserDTO {
     private String country;
     private String phoneNumber;
     private String description;
+    private String avatarId;
+    private String pictureUrl;
     private List<EducationDTO> education;
     private List<ExperienceDTO> experience;
     private List<ProjectDTO> project;
@@ -30,6 +32,7 @@ public class UserDTO {
 
     public UserDTO(Long id, String firstName, String lastName, String email, String password,
                    String address, String city, String country, String phoneNumber, String description,
+                   String avatarId, String pictureUrl,
                    List<EducationDTO> education, List<ExperienceDTO> experience, List<ProjectDTO> project,
                    List<UserKnowledgeDTO> competences, List<UserKnowledgeDTO> besoins) {
         this.id = id;
@@ -42,6 +45,8 @@ public class UserDTO {
         this.country = country;
         this.phoneNumber = phoneNumber;
         this.description = description;
+        this.avatarId = avatarId;
+        this.pictureUrl = pictureUrl;
         this.education = education;
         this.experience = experience;
         this.project = project;
@@ -127,6 +132,22 @@ public class UserDTO {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getAvatarId() {
+        return avatarId;
+    }
+
+    public void setAvatarId(String avatarId) {
+        this.avatarId = avatarId;
+    }
+
+    public String getPictureUrl() {
+        return pictureUrl;
+    }
+
+    public void setPictureUrl(String pictureUrl) {
+        this.pictureUrl = pictureUrl;
     }
 
     public List<EducationDTO> getEducation() {

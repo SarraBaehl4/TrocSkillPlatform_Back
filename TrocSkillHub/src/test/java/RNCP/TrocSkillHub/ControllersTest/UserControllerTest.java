@@ -63,6 +63,8 @@ public class UserControllerTest {
             null,
             null,
             null,
+            null,
+            null,
             Collections.emptyList(),
             Collections.emptyList()
         );
@@ -75,9 +77,10 @@ public class UserControllerTest {
     void getAllUsers_shouldReturnUserList() {
 
         List<User> users = Arrays.asList(user);
+        List<UserDTO> userDTOs = Arrays.asList(userDTO);
 
         when(userService.getAllUsers()).thenReturn(users);
-        when(userService.buildUserDTO(user)).thenReturn(userDTO);
+        when(userMapper.toDTOList(users)).thenReturn(userDTOs);
 
         ResponseEntity<List<UserDTO>> response = userController.getAllUsers();
 
@@ -90,6 +93,7 @@ public class UserControllerTest {
     @DisplayName("getAllUsers - should return empty list when no users")
     void getAllUsers_shouldReturnEmptyList_whenNoUsers() {
         when(userService.getAllUsers()).thenReturn(Collections.emptyList());
+        when(userMapper.toDTOList(Collections.emptyList())).thenReturn(Collections.emptyList());
 
         ResponseEntity<List<UserDTO>> response = userController.getAllUsers();
 
@@ -104,7 +108,7 @@ public class UserControllerTest {
     void getUserById_shouldReturnUser_whenUserExists() {
 
         when(userService.getUserById(1L)).thenReturn(Optional.of(user));
-        when(userService.buildUserDTO(user)).thenReturn(userDTO);
+        when(userMapper.toDTO(user)).thenReturn(userDTO);
 
         ResponseEntity<?> response = userController.getUserById(1L);
 

@@ -1,7 +1,6 @@
 package RNCP.TrocSkillHub.Controllers;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -43,10 +42,7 @@ public class UserController {
     @GetMapping
     public ResponseEntity<List<UserDTO>> getAllUsers() {
         List<User> users = userService.getAllUsers();
-        List<UserDTO> userDTOs = users.stream()
-                .map(userService::buildUserDTO)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(userDTOs);
+        return ResponseEntity.ok(userMapper.toDTOList(users));
     }
 
     // Récuperer les données utilisateur à partir d'un id (avec compétences et
@@ -54,7 +50,7 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
         return userService.getUserById(id)
-                .map(user -> ResponseEntity.ok(userService.buildUserDTO(user)))
+                .map(user -> ResponseEntity.ok(userMapper.toDTO(user)))
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(null));
     }
@@ -117,5 +113,4 @@ public class UserController {
                     .body("Erreur: " + e.getMessage());
         }
     }
-
 }

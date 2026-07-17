@@ -3,8 +3,6 @@ package RNCP.TrocSkillHub.Services.ImplServices;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
@@ -13,13 +11,9 @@ import org.springframework.data.domain.Pageable;
 
 import RNCP.TrocSkillHub.DTOs.UserCardDTO;
 import RNCP.TrocSkillHub.DTOs.UserDTO;
-import RNCP.TrocSkillHub.DTOs.UserKnowledgeDTO;
-import RNCP.TrocSkillHub.Mappers.UserKnowledgeMapper;
 import RNCP.TrocSkillHub.Mappers.UserMapper;
 import RNCP.TrocSkillHub.Models.Enums.KnowledgeType;
 import RNCP.TrocSkillHub.Models.User;
-import RNCP.TrocSkillHub.Models.UserKnowledge;
-import RNCP.TrocSkillHub.Repositories.UserKnowledgeRepository;
 import RNCP.TrocSkillHub.Repositories.UserRepository;
 import RNCP.TrocSkillHub.Services.UserService;
 import RNCP.TrocSkillHub.Utils.AvatarConstants;
@@ -27,24 +21,15 @@ import RNCP.TrocSkillHub.Utils.AvatarConstants;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private static final String AVATAR_BASE_PATH = "/avatars/";
-    private static final String DICEBEAR_INITIALS_URL = "https://api.dicebear.com/9.x/initials/svg?seed=";
-
     private final UserRepository userRepository;
-    private final UserKnowledgeRepository userKnowledgeRepository;
     private final UserMapper userMapper;
-    private final UserKnowledgeMapper userKnowledgeMapper;
     private final PasswordEncoder passwordEncoder;
 
     public UserServiceImpl(UserRepository userRepository,
-            UserKnowledgeRepository userKnowledgeRepository,
             UserMapper userMapper,
-            UserKnowledgeMapper userKnowledgeMapper,
             PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.userKnowledgeRepository = userKnowledgeRepository;
         this.userMapper = userMapper;
-        this.userKnowledgeMapper = userKnowledgeMapper;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -67,28 +52,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<User> getUserById(Long id) {
         return userRepository.findById(id);
-    }
-
-    @Override
-    public UserDTO buildUserDTO(User user) {
-        UserDTO dto = userMapper.toDTO(user);
-
-        List<UserKnowledge> userKnowledges = userKnowledgeRepository.findByUserId(user.getId());
-
-        List<UserKnowledgeDTO> competences = userKnowledges.stream()
-                .filter(uk -> uk.getType() == KnowledgeType.SKILL)
-                .map(userKnowledgeMapper::toDTO)
-                .collect(Collectors.toList());
-
-        List<UserKnowledgeDTO> besoins = userKnowledges.stream()
-                .filter(uk -> uk.getType() == KnowledgeType.NEED)
-                .map(userKnowledgeMapper::toDTO)
-                .collect(Collectors.toList());
-
-        dto.setCompetences(competences);
-        dto.setBesoins(besoins);
-
-        return dto;
     }
 
     @Override
@@ -163,23 +126,15 @@ public class UserServiceImpl implements UserService {
     }
 
     private UserCardDTO toUserCardDTO(User user) {
-        UserDTO fullDTO = buildUserDTO(user);
+        UserDTO fullDTO = userMapper.toDTO(user);
 
         UserCardDTO card = new UserCardDTO();
         card.setId(fullDTO.getId());
         card.setPseudo(fullDTO.getFirstName() + " " + fullDTO.getLastName());
-        card.setPictureUrl(buildPictureUrl(user));
+        card.setPictureUrl(fullDTO.getPictureUrl());
         card.setCompetences(fullDTO.getCompetences());
         card.setBesoins(fullDTO.getBesoins());
         return card;
-    }
-
-    private String buildPictureUrl(User user) {
-        if (user.getAvatarId() != null) {
-            return AVATAR_BASE_PATH + user.getAvatarId() + ".svg";
-        }
-        String pseudo = user.getFirstName() + " " + user.getLastName();
-        return DICEBEAR_INITIALS_URL + pseudo;
     }
 
     @Override
