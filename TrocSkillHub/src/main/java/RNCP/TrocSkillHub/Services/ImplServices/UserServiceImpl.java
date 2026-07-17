@@ -22,6 +22,7 @@ import RNCP.TrocSkillHub.Models.UserKnowledge;
 import RNCP.TrocSkillHub.Repositories.UserKnowledgeRepository;
 import RNCP.TrocSkillHub.Repositories.UserRepository;
 import RNCP.TrocSkillHub.Services.UserService;
+import RNCP.TrocSkillHub.Utils.AvatarConstants;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -179,5 +180,19 @@ public class UserServiceImpl implements UserService {
         }
         String pseudo = user.getFirstName() + " " + user.getLastName();
         return DICEBEAR_INITIALS_URL + pseudo;
+    }
+
+    @Override
+    public User updateAvatar(Long userId, String avatarId) {
+        if (!AvatarConstants.isValidAvatarId(avatarId)) {
+            throw new RuntimeException("Avatar invalide: " + avatarId);
+        }
+
+        return userRepository.findById(userId)
+                .map(existingUser -> {
+                    existingUser.setAvatarId(avatarId);
+                    return userRepository.save(existingUser);
+                })
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec l'id: " + userId));
     }
 }

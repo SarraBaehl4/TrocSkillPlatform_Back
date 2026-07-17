@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import RNCP.TrocSkillHub.DTOs.UpdateAvatarDTO;
 import RNCP.TrocSkillHub.DTOs.UserCardDTO;
 import RNCP.TrocSkillHub.DTOs.UserDTO;
 import RNCP.TrocSkillHub.Mappers.UserMapper;
@@ -103,6 +104,18 @@ public class UserController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(userService.getUserCards(page, size));
+    }
+
+    @PutMapping("/{id}/avatar")
+    public ResponseEntity<?> updateAvatar(@PathVariable Long id, @RequestBody UpdateAvatarDTO request) {
+        try {
+            User updatedUser = userService.updateAvatar(id, request.getAvatarId());
+            UserDTO responseDTO = userMapper.toDTO(updatedUser);
+            return ResponseEntity.ok(responseDTO);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Erreur: " + e.getMessage());
+        }
     }
 
 }

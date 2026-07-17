@@ -17,6 +17,7 @@ public interface UserService {
     List<User> getAllUsers();
     User updateUser(Long id, User user);
     void deleteUser(Long id);
+    User updateAvatar(Long userId, String avatarId);
     
     // Méthodes spécifiques basées sur le repository
     Optional<User> getUserByEmail(String email);
