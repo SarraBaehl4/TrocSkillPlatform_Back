@@ -3,40 +3,33 @@ package RNCP.TrocSkillHub.Services.ImplServices;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import RNCP.TrocSkillHub.DTOs.UserCardDTO;
 import RNCP.TrocSkillHub.DTOs.UserDTO;
-import RNCP.TrocSkillHub.DTOs.UserKnowledgeDTO;
-import RNCP.TrocSkillHub.Mappers.UserKnowledgeMapper;
 import RNCP.TrocSkillHub.Mappers.UserMapper;
 import RNCP.TrocSkillHub.Models.Enums.KnowledgeType;
 import RNCP.TrocSkillHub.Models.User;
-import RNCP.TrocSkillHub.Models.UserKnowledge;
-import RNCP.TrocSkillHub.Repositories.UserKnowledgeRepository;
 import RNCP.TrocSkillHub.Repositories.UserRepository;
 import RNCP.TrocSkillHub.Services.UserService;
+import RNCP.TrocSkillHub.Utils.AvatarConstants;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final UserKnowledgeRepository userKnowledgeRepository;
     private final UserMapper userMapper;
-    private final UserKnowledgeMapper userKnowledgeMapper;
     private final PasswordEncoder passwordEncoder;
 
     public UserServiceImpl(UserRepository userRepository,
-                            UserKnowledgeRepository userKnowledgeRepository,
-                            UserMapper userMapper,
-                            UserKnowledgeMapper userKnowledgeMapper,
-                            PasswordEncoder passwordEncoder) {
+            UserMapper userMapper,
+            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.userKnowledgeRepository = userKnowledgeRepository;
         this.userMapper = userMapper;
-        this.userKnowledgeMapper = userKnowledgeMapper;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -62,44 +55,21 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO buildUserDTO(User user) {
-        UserDTO dto = userMapper.toDTO(user);
-
-        List<UserKnowledge> userKnowledges = userKnowledgeRepository.findByUserId(user.getId());
-
-        List<UserKnowledgeDTO> competences = userKnowledges.stream()
-                .filter(uk -> uk.getType() == KnowledgeType.SKILL)
-                .map(userKnowledgeMapper::toDTO)
-                .collect(Collectors.toList());
-
-        List<UserKnowledgeDTO> besoins = userKnowledges.stream()
-                .filter(uk -> uk.getType() == KnowledgeType.NEED)
-                .map(userKnowledgeMapper::toDTO)
-                .collect(Collectors.toList());
-
-        dto.setCompetences(competences);
-        dto.setBesoins(besoins);
-
-        return dto;
-    }
-
-    @Override
     public User updateUser(Long id, User user) {
         return userRepository.findById(id)
-            .map(existingUser -> {
-                existingUser.setFirstName(user.getFirstName());
-                existingUser.setLastName(user.getLastName());
-                existingUser.setAddress(user.getAddress());
-                existingUser.setEmail(user.getEmail());
-                existingUser.setPicture(user.getPicture());
-                existingUser.setCity(user.getCity());
-                existingUser.setCountry(user.getCountry());
-                existingUser.setPhoneNumber(user.getPhoneNumber());
-                existingUser.setDescription(user.getDescription());
-                existingUser.setUpdatedAt(LocalDate.now());
-                return userRepository.save(existingUser);
-            })
-            .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec l'id: " + id));
+                .map(existingUser -> {
+                    existingUser.setFirstName(user.getFirstName());
+                    existingUser.setLastName(user.getLastName());
+                    existingUser.setAddress(user.getAddress());
+                    existingUser.setEmail(user.getEmail());
+                    existingUser.setCity(user.getCity());
+                    existingUser.setCountry(user.getCountry());
+                    existingUser.setPhoneNumber(user.getPhoneNumber());
+                    existingUser.setDescription(user.getDescription());
+                    existingUser.setUpdatedAt(LocalDate.now());
+                    return userRepository.save(existingUser);
+                })
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec l'id: " + id));
     }
 
     @Override
@@ -146,5 +116,38 @@ public class UserServiceImpl implements UserService {
         if (!password.matches(".*[@#$%^&+=!?*].*")) {
             throw new RuntimeException("Le mot de passe doit contenir au moins un caractère spécial (@#$%^&+=!?*)");
         }
+    }
+
+    @Override
+    public Page<UserCardDTO> getUserCards(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<User> users = userRepository.findAllWithAtLeastOneSkill(KnowledgeType.SKILL, pageable);
+        return users.map(this::toUserCardDTO);
+    }
+
+    private UserCardDTO toUserCardDTO(User user) {
+        UserDTO fullDTO = userMapper.toDTO(user);
+
+        UserCardDTO card = new UserCardDTO();
+        card.setId(fullDTO.getId());
+        card.setPseudo(fullDTO.getFirstName() + " " + fullDTO.getLastName());
+        card.setPictureUrl(fullDTO.getPictureUrl());
+        card.setCompetences(fullDTO.getCompetences());
+        card.setBesoins(fullDTO.getBesoins());
+        return card;
+    }
+
+    @Override
+    public User updateAvatar(Long userId, String avatarId) {
+        if (!AvatarConstants.isValidAvatarId(avatarId)) {
+            throw new RuntimeException("Avatar invalide: " + avatarId);
+        }
+
+        return userRepository.findById(userId)
+                .map(existingUser -> {
+                    existingUser.setAvatarId(avatarId);
+                    return userRepository.save(existingUser);
+                })
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec l'id: " + userId));
     }
 }

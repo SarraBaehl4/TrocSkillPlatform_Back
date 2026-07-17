@@ -1,21 +1,19 @@
 package RNCP.TrocSkillHub.Services.ImplServices;
 
+import RNCP.TrocSkillHub.DTOs.UserCardDTO;
 import RNCP.TrocSkillHub.DTOs.UserDTO;
-import RNCP.TrocSkillHub.DTOs.UserKnowledgeDTO;
-import RNCP.TrocSkillHub.Mappers.UserKnowledgeMapper;
 import RNCP.TrocSkillHub.Mappers.UserMapper;
-import RNCP.TrocSkillHub.Models.Category;
-import RNCP.TrocSkillHub.Models.Knowledge;
-import RNCP.TrocSkillHub.Models.Enums.KnowledgeType;
 import RNCP.TrocSkillHub.Models.User;
-import RNCP.TrocSkillHub.Models.UserKnowledge;
-import RNCP.TrocSkillHub.Repositories.UserKnowledgeRepository;
 import RNCP.TrocSkillHub.Repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Arrays;
@@ -34,13 +32,7 @@ class UserServiceImplTest {
     private UserRepository userRepository;
 
     @Mock
-    private UserKnowledgeRepository userKnowledgeRepository;
-
-    @Mock
     private UserMapper userMapper;
-
-    @Mock
-    private UserKnowledgeMapper userKnowledgeMapper;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -59,24 +51,6 @@ class UserServiceImplTest {
         user.setLastName("Doe");
         user.setEmail("john.doe@example.com");
         user.setPassword("hashedPassword");
-    }
-
-    private UserKnowledge buildUserKnowledge(Long id, KnowledgeType type, String knowledgeName) {
-        Category category = new Category();
-        category.setId(1L);
-        category.setName("Informatique");
-
-        Knowledge knowledge = new Knowledge();
-        knowledge.setId(1L);
-        knowledge.setName(knowledgeName);
-        knowledge.setCategory(category);
-
-        UserKnowledge userKnowledge = new UserKnowledge();
-        userKnowledge.setId(id);
-        userKnowledge.setUser(user);
-        userKnowledge.setKnowledge(knowledge);
-        userKnowledge.setType(type);
-        return userKnowledge;
     }
 
     @Test
@@ -228,64 +202,6 @@ class UserServiceImplTest {
     }
 
     @Test
-    void buildUserDTO_ShouldSeparateCompetencesAndBesoins() {
-        UserKnowledge skill = buildUserKnowledge(1L, KnowledgeType.SKILL, "Java");
-        UserKnowledge need = buildUserKnowledge(2L, KnowledgeType.NEED, "Guitare");
-
-        UserDTO baseDTO = new UserDTO();
-        baseDTO.setId(1L);
-        baseDTO.setFirstName("John");
-
-        UserKnowledgeDTO skillDTO = new UserKnowledgeDTO();
-        skillDTO.setId(1L);
-        skillDTO.setKnowledgeName("Java");
-        skillDTO.setType(KnowledgeType.SKILL);
-
-        UserKnowledgeDTO needDTO = new UserKnowledgeDTO();
-        needDTO.setId(2L);
-        needDTO.setKnowledgeName("Guitare");
-        needDTO.setType(KnowledgeType.NEED);
-
-        when(userMapper.toDTO(user)).thenReturn(baseDTO);
-        when(userKnowledgeRepository.findByUserId(1L)).thenReturn(Arrays.asList(skill, need));
-        when(userKnowledgeMapper.toDTO(skill)).thenReturn(skillDTO);
-        when(userKnowledgeMapper.toDTO(need)).thenReturn(needDTO);
-
-        UserDTO result = userService.buildUserDTO(user);
-
-        assertThat(result.getCompetences()).hasSize(1);
-        assertThat(result.getCompetences().get(0).getKnowledgeName()).isEqualTo("Java");
-
-        assertThat(result.getBesoins()).hasSize(1);
-        assertThat(result.getBesoins().get(0).getKnowledgeName()).isEqualTo("Guitare");
-    }
-
-    @Test
-    void buildUserDTO_ShouldReturnEmptyLists_WhenUserHasNoKnowledges() {
-        UserDTO baseDTO = new UserDTO();
-        baseDTO.setId(1L);
-
-        when(userMapper.toDTO(user)).thenReturn(baseDTO);
-        when(userKnowledgeRepository.findByUserId(1L)).thenReturn(Collections.emptyList());
-
-        UserDTO result = userService.buildUserDTO(user);
-
-        assertThat(result.getCompetences()).isEmpty();
-        assertThat(result.getBesoins()).isEmpty();
-    }
-
-    @Test
-    void buildUserDTO_ShouldCallRepositoryWithCorrectUserId() {
-        UserDTO baseDTO = new UserDTO();
-        when(userMapper.toDTO(user)).thenReturn(baseDTO);
-        when(userKnowledgeRepository.findByUserId(1L)).thenReturn(Collections.emptyList());
-
-        userService.buildUserDTO(user);
-
-        verify(userKnowledgeRepository, times(1)).findByUserId(1L);
-    }
-
-    @Test
     void updateUser_ShouldUpdateAndReturnUser_WhenUserExists() {
         User inputChanges = new User();
         inputChanges.setFirstName("Jane");
@@ -422,5 +338,67 @@ class UserServiceImplTest {
         List<User> result = userService.getUsersByCountry("Espagne");
 
         assertThat(result).isEmpty();
+    }
+
+    @Test
+    void getUserCards_ShouldReturnPageOfUserCardDTO() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<User> userPage = new PageImpl<>(Arrays.asList(user));
+
+        UserDTO fullDTO = new UserDTO();
+        fullDTO.setId(1L);
+        fullDTO.setFirstName("John");
+        fullDTO.setLastName("Doe");
+        fullDTO.setPictureUrl("/avatars/avatar1.svg");
+        fullDTO.setCompetences(Collections.emptyList());
+        fullDTO.setBesoins(Collections.emptyList());
+
+        when(userRepository.findAllWithAtLeastOneSkill(any(), any(Pageable.class))).thenReturn(userPage);
+        when(userMapper.toDTO(user)).thenReturn(fullDTO);
+
+        Page<UserCardDTO> result = userService.getUserCards(0, 10);
+
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).getPseudo()).isEqualTo("John Doe");
+        assertThat(result.getContent().get(0).getPictureUrl()).isEqualTo("/avatars/avatar1.svg");
+    }
+
+    @Test
+    void getUserCards_ShouldReturnEmptyPage_WhenNoUsersHaveSkills() {
+        Page<User> emptyPage = new PageImpl<>(Collections.emptyList());
+        when(userRepository.findAllWithAtLeastOneSkill(any(), any(Pageable.class))).thenReturn(emptyPage);
+
+        Page<UserCardDTO> result = userService.getUserCards(0, 10);
+
+        assertThat(result.getContent()).isEmpty();
+    }
+
+    @Test
+    void updateAvatar_ShouldUpdateAndReturnUser_WhenAvatarIdIsValid() {
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.save(user)).thenReturn(user);
+
+        User result = userService.updateAvatar(1L, "avatar17");
+
+        assertThat(result.getAvatarId()).isEqualTo("avatar17");
+        verify(userRepository, times(1)).save(user);
+    }
+
+    @Test
+    void updateAvatar_ShouldThrowException_WhenAvatarIdIsInvalid() {
+        assertThatThrownBy(() -> userService.updateAvatar(1L, "avatar999"))
+            .isInstanceOf(RuntimeException.class)
+            .hasMessageContaining("Avatar invalide");
+
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void updateAvatar_ShouldThrowException_WhenUserNotFound() {
+        when(userRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> userService.updateAvatar(999L, "avatar1"))
+            .isInstanceOf(RuntimeException.class)
+            .hasMessageContaining("Utilisateur non trouvé avec l'id: 999");
     }
 }

@@ -2,11 +2,8 @@ package RNCP.TrocSkillHub.Models;
 
 import jakarta.persistence.*;
 
-import java.sql.Types;
 import java.time.LocalDate;
 import java.util.List;
-
-import org.hibernate.annotations.JdbcTypeCode;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -15,41 +12,40 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class User {
 
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @Column(name = "first_name", nullable = false)
     private String firstName;
-    
+
     @Column(name = "last_name", nullable = false)
     private String lastName;
-    
-    @JdbcTypeCode(Types.BINARY)
-    @Column(nullable = true)
-    private byte[] picture;
-    
+
     @Column(nullable = false, unique = true)
     private String email;
-    
+
     @JsonIgnore
     @Column(nullable = false)
     private String password;
 
+    @Column(name = "avatar_id", nullable = true)
+    private String avatarId;
+
     @Column(nullable = true)
     private String address;
-    
+
     @Column(nullable = true)
     private String city;
-    
+
     @Column(name = "country", nullable = true)
     private String country;
-    
+
     @Column(name = "phone_number", nullable = true)
     private String phoneNumber;
-    
+
     @Column(nullable = true, columnDefinition = "TEXT")
     private String description;
-    
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDate createdAt;
 
@@ -60,7 +56,7 @@ public class User {
     protected void onCreate() {
         this.createdAt = LocalDate.now();
     }
-    
+
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = LocalDate.now();
@@ -79,22 +75,23 @@ public class User {
     public User() {
     }
 
-    public User(String firstName, String lastName, String address, String country, String city, String phoneNumber,
-            String email, byte[] picture, List<Education> education, List<Experience> experience,
+    public User(String firstName, String lastName,String avatar_id, String address, String country, String city, String phoneNumber,
+            String email, List<Education> education, List<Experience> experience,
             List<Project> project) {
-       
+
         this.firstName = firstName;
         this.lastName = lastName;
+        this.avatarId = avatar_id;
         this.address = address;
         this.country = country;
         this.city = city;
         this.phoneNumber = phoneNumber;
         this.email = email;
-        this.picture = picture;
         this.education = education;
         this.experience = experience;
         this.project = project;
     }
+
     // Getters
     public Long getId() {
         return id;
@@ -108,16 +105,16 @@ public class User {
         return lastName;
     }
 
-    public byte[] getPicture() {
-        return picture;
-    }
-
     public String getEmail() {
         return email;
     }
 
     public String getPassword() {
         return password;
+    }
+
+    public String getAvatarId() {
+        return avatarId;
     }
 
     public String getAddress() {
@@ -143,7 +140,8 @@ public class User {
     public LocalDate getCreatedAt() {
         return createdAt;
     }
-    public LocalDate getUpdatedAt(){
+
+    public LocalDate getUpdatedAt() {
         return updatedAt;
     }
 
@@ -160,16 +158,16 @@ public class User {
         this.lastName = lastName;
     }
 
-    public void setPicture(byte[] picture) {
-        this.picture = picture;
-    }
-
     public void setEmail(String email) {
         this.email = email;
     }
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public void setAvatarId(String avatarId) {
+        this.avatarId = avatarId;
     }
 
     public void setAddress(String address) {
@@ -195,24 +193,23 @@ public class User {
     public void setCreatedAt(LocalDate createdAt) {
         this.createdAt = createdAt;
     }
-    
-    public void setUpdatedAt(LocalDate updateAt){
+
+    public void setUpdatedAt(LocalDate updateAt) {
         this.updatedAt = updateAt;
     }
 
-@Override
-public String toString() {
-    return "User{" +
-            "firstName='" + firstName + '\'' +
-            ", lastName='" + lastName + '\'' +
-            ", address='" + address + '\'' +
-            ", country='" + country + '\'' +
-            ", city='" + city + '\'' +
-            ", phoneNumber='" + phoneNumber + '\'' +
-            ", email='" + email + '\'' +
-            ", picture=" + (picture != null ? "byte[" + picture.length + "]" : "null") +
-            ", createdAt=" + createdAt +
-            ", updatedAt=" + updatedAt +
-            '}';
-}
+    @Override
+    public String toString() {
+        return "User{" +
+                "firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", address='" + address + '\'' +
+                ", country='" + country + '\'' +
+                ", city='" + city + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", email='" + email + '\'' +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
+    }
 }
