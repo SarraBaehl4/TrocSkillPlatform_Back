@@ -27,7 +27,7 @@ import RNCP.TrocSkillHub.Utils.AvatarConstants;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private static final String DICEBEAR_ADVENTURER_URL = "https://api.dicebear.com/9.x/adventurer/svg?seed=";
+    private static final String AVATAR_BASE_PATH = "/avatars/";
     private static final String DICEBEAR_INITIALS_URL = "https://api.dicebear.com/9.x/initials/svg?seed=";
 
     private final UserRepository userRepository;
@@ -176,7 +176,7 @@ public class UserServiceImpl implements UserService {
 
     private String buildPictureUrl(User user) {
         if (user.getAvatarId() != null) {
-            return DICEBEAR_ADVENTURER_URL + user.getAvatarId();
+            return AVATAR_BASE_PATH + user.getAvatarId() + ".svg";
         }
         String pseudo = user.getFirstName() + " " + user.getLastName();
         return DICEBEAR_INITIALS_URL + pseudo;
