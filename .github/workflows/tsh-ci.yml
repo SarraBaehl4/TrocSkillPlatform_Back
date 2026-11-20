@@ -8,10 +8,6 @@ name: TrocSkillHub CI
 # ║ DECLENCHEURS : Quand la pipeline se lance                  ║
 # ╚════════════════════════════════════════════════════════════╝
 on:
-  push:
-    branches:
-      - '**'
-
   pull_request:
     branches:
       - main

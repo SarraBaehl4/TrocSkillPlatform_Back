@@ -19,6 +19,7 @@ public class Knowledge {
     @Column(name = "name")
     private String name;
     
-    @Column(name = "category_id")
-    private Long categoryId;
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
 }

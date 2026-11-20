@@ -1,5 +1,6 @@
 package RNCP.TrocSkillHub.Models;
 
+import RNCP.TrocSkillHub.Models.Enums.KnowledgeType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,4 +27,8 @@ public class UserKnowledge {
 
     @Column(name = "level")
     private String level;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false)
+    private KnowledgeType type;
 }

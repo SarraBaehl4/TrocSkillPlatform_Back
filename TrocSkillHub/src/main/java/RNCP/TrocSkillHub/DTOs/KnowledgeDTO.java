@@ -11,4 +11,5 @@ public class KnowledgeDTO {
     private Long id;
     private String name;
     private Long categoryId;
+    String categoryName;
 }

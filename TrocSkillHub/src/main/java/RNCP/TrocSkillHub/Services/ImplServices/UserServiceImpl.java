@@ -3,39 +3,44 @@ package RNCP.TrocSkillHub.Services.ImplServices;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import RNCP.TrocSkillHub.DTOs.UserCardDTO;
+import RNCP.TrocSkillHub.DTOs.UserDTO;
+import RNCP.TrocSkillHub.Mappers.UserMapper;
+import RNCP.TrocSkillHub.Models.Enums.KnowledgeType;
 import RNCP.TrocSkillHub.Models.User;
 import RNCP.TrocSkillHub.Repositories.UserRepository;
 import RNCP.TrocSkillHub.Services.UserService;
+import RNCP.TrocSkillHub.Utils.AvatarConstants;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository,
+            UserMapper userMapper,
+            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public User createUser(User user) {
-        // Vérif email
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new RuntimeException("Cet email existe déjà!");
         }
-        
-        // Valider la force du mot de passe
         validatePasswordStrength(user.getPassword());
-        
-        // Hacher le mot de passe avant de le stocker
         String hashedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(hashedPassword);
-        
         return userRepository.save(user);
     }
 
@@ -52,20 +57,19 @@ public class UserServiceImpl implements UserService {
     @Override
     public User updateUser(Long id, User user) {
         return userRepository.findById(id)
-            .map(existingUser -> {
-                existingUser.setFirstName(user.getFirstName());
-                existingUser.setLastName(user.getLastName());
-                existingUser.setAddress(user.getAddress());
-                existingUser.setEmail(user.getEmail());
-                existingUser.setPicture(user.getPicture());
-                existingUser.setCity(user.getCity());
-                existingUser.setCountry(user.getCountry());
-                existingUser.setPhoneNumber(user.getPhoneNumber());
-                existingUser.setDescription(user.getDescription());
-                existingUser.setUpdatedAt(LocalDate.now());
-                return userRepository.save(existingUser);
-            })
-            .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec l'id: " + id));
+                .map(existingUser -> {
+                    existingUser.setFirstName(user.getFirstName());
+                    existingUser.setLastName(user.getLastName());
+                    existingUser.setAddress(user.getAddress());
+                    existingUser.setEmail(user.getEmail());
+                    existingUser.setCity(user.getCity());
+                    existingUser.setCountry(user.getCountry());
+                    existingUser.setPhoneNumber(user.getPhoneNumber());
+                    existingUser.setDescription(user.getDescription());
+                    existingUser.setUpdatedAt(LocalDate.now());
+                    return userRepository.save(existingUser);
+                })
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec l'id: " + id));
     }
 
     @Override
@@ -110,7 +114,40 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Le mot de passe doit contenir au moins un chiffre");
         }
         if (!password.matches(".*[@#$%^&+=!?*].*")) {
-        throw new RuntimeException("Le mot de passe doit contenir au moins un caractère spécial (@#$%^&+=!?*)");
+            throw new RuntimeException("Le mot de passe doit contenir au moins un caractère spécial (@#$%^&+=!?*)");
         }
+    }
+
+    @Override
+    public Page<UserCardDTO> getUserCards(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<User> users = userRepository.findAllWithAtLeastOneSkill(KnowledgeType.SKILL, pageable);
+        return users.map(this::toUserCardDTO);
+    }
+
+    private UserCardDTO toUserCardDTO(User user) {
+        UserDTO fullDTO = userMapper.toDTO(user);
+
+        UserCardDTO card = new UserCardDTO();
+        card.setId(fullDTO.getId());
+        card.setPseudo(fullDTO.getFirstName() + " " + fullDTO.getLastName());
+        card.setPictureUrl(fullDTO.getPictureUrl());
+        card.setCompetences(fullDTO.getCompetences());
+        card.setBesoins(fullDTO.getBesoins());
+        return card;
+    }
+
+    @Override
+    public User updateAvatar(Long userId, String avatarId) {
+        if (!AvatarConstants.isValidAvatarId(avatarId)) {
+            throw new RuntimeException("Avatar invalide: " + avatarId);
+        }
+
+        return userRepository.findById(userId)
+                .map(existingUser -> {
+                    existingUser.setAvatarId(avatarId);
+                    return userRepository.save(existingUser);
+                })
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec l'id: " + userId));
     }
 }

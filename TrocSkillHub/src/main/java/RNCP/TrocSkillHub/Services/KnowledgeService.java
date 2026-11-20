@@ -2,7 +2,9 @@ package RNCP.TrocSkillHub.Services;
 
 import RNCP.TrocSkillHub.DTOs.KnowledgeDTO;
 import RNCP.TrocSkillHub.Mappers.KnowledgeMapper;
+import RNCP.TrocSkillHub.Models.Category;
 import RNCP.TrocSkillHub.Models.Knowledge;
+import RNCP.TrocSkillHub.Repositories.CategoryRepository;
 import RNCP.TrocSkillHub.Repositories.KnowledgeRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,10 +16,14 @@ import java.util.List;
 public class KnowledgeService {
     
     private final KnowledgeRepository knowledgeRepository;
+    private final CategoryRepository categoryRepository;
     private final KnowledgeMapper knowledgeMapper;
     
-    public KnowledgeService(KnowledgeRepository knowledgeRepository, KnowledgeMapper knowledgeMapper) {
+    public KnowledgeService(KnowledgeRepository knowledgeRepository,
+                             CategoryRepository categoryRepository,
+                             KnowledgeMapper knowledgeMapper) {
         this.knowledgeRepository = knowledgeRepository;
+        this.categoryRepository = categoryRepository;
         this.knowledgeMapper = knowledgeMapper;
     }
     
@@ -37,7 +43,13 @@ public class KnowledgeService {
     // CREATE
     @Transactional
     public KnowledgeDTO createKnowledge(KnowledgeDTO knowledgeDTO) {
-        Knowledge knowledge = knowledgeMapper.toEntity(knowledgeDTO);
+        Category category = categoryRepository.findById(knowledgeDTO.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found with id: " + knowledgeDTO.getCategoryId()));
+        
+        Knowledge knowledge = new Knowledge();
+        knowledge.setName(knowledgeDTO.getName());
+        knowledge.setCategory(category);
+        
         Knowledge savedKnowledge = knowledgeRepository.save(knowledge);
         return knowledgeMapper.toDTO(savedKnowledge);
     }
@@ -48,8 +60,11 @@ public class KnowledgeService {
         Knowledge existingKnowledge = knowledgeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Knowledge not found with id: " + id));
         
+        Category category = categoryRepository.findById(knowledgeDTO.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found with id: " + knowledgeDTO.getCategoryId()));
+        
         existingKnowledge.setName(knowledgeDTO.getName());
-        existingKnowledge.setCategoryId(knowledgeDTO.getCategoryId());
+        existingKnowledge.setCategory(category);
         
         Knowledge updatedKnowledge = knowledgeRepository.save(existingKnowledge);
         return knowledgeMapper.toDTO(updatedKnowledge);
