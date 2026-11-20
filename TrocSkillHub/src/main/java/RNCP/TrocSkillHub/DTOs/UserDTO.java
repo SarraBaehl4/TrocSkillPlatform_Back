@@ -21,9 +21,6 @@ public class UserDTO {
     private String description;
     private String avatarId;
     private String pictureUrl;
-    private List<EducationDTO> education;
-    private List<ExperienceDTO> experience;
-    private List<ProjectDTO> project;
     private List<UserKnowledgeDTO> competences;
     private List<UserKnowledgeDTO> besoins;
 
@@ -33,7 +30,6 @@ public class UserDTO {
     public UserDTO(Long id, String firstName, String lastName, String email, String password,
                    String address, String city, String country, String phoneNumber, String description,
                    String avatarId, String pictureUrl,
-                   List<EducationDTO> education, List<ExperienceDTO> experience, List<ProjectDTO> project,
                    List<UserKnowledgeDTO> competences, List<UserKnowledgeDTO> besoins) {
         this.id = id;
         this.firstName = firstName;
@@ -47,9 +43,6 @@ public class UserDTO {
         this.description = description;
         this.avatarId = avatarId;
         this.pictureUrl = pictureUrl;
-        this.education = education;
-        this.experience = experience;
-        this.project = project;
         this.competences = competences;
         this.besoins = besoins;
     }
@@ -148,30 +141,6 @@ public class UserDTO {
 
     public void setPictureUrl(String pictureUrl) {
         this.pictureUrl = pictureUrl;
-    }
-
-    public List<EducationDTO> getEducation() {
-        return education;
-    }
-
-    public void setEducation(List<EducationDTO> education) {
-        this.education = education;
-    }
-
-    public List<ExperienceDTO> getExperience() {
-        return experience;
-    }
-
-    public void setExperience(List<ExperienceDTO> experience) {
-        this.experience = experience;
-    }
-
-    public List<ProjectDTO> getProject() {
-        return project;
-    }
-
-    public void setProject(List<ProjectDTO> project) {
-        this.project = project;
     }
 
     public List<UserKnowledgeDTO> getCompetences() {

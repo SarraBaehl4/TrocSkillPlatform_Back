@@ -6,15 +6,9 @@ import java.util.stream.Collectors;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import RNCP.TrocSkillHub.DTOs.EducationDTO;
-import RNCP.TrocSkillHub.DTOs.ExperienceDTO;
-import RNCP.TrocSkillHub.DTOs.ProjectDTO;
 import RNCP.TrocSkillHub.DTOs.UserDTO;
 import RNCP.TrocSkillHub.DTOs.UserKnowledgeDTO;
-import RNCP.TrocSkillHub.Models.Education;
 import RNCP.TrocSkillHub.Models.Enums.KnowledgeType;
-import RNCP.TrocSkillHub.Models.Experience;
-import RNCP.TrocSkillHub.Models.Project;
 import RNCP.TrocSkillHub.Models.User;
 import RNCP.TrocSkillHub.Models.UserKnowledge;
 import RNCP.TrocSkillHub.Repositories.UserKnowledgeRepository;
@@ -37,19 +31,7 @@ public abstract class UserMapper {
 
     public abstract UserDTO toDTO(User user);
 
-    public abstract EducationDTO toDTO(Education education);
-
-    public abstract ExperienceDTO toDTO(Experience experience);
-
-    public abstract ProjectDTO toDTO(Project project);
-
     public abstract User toEntity(UserDTO userDTO);
-
-    public abstract Education toEntity(EducationDTO educationDTO);
-
-    public abstract Experience toEntity(ExperienceDTO experienceDTO);
-
-    public abstract Project toEntity(ProjectDTO projectDTO);
 
     public abstract List<UserDTO> toDTOList(List<User> users);
 

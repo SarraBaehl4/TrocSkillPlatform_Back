@@ -62,9 +62,6 @@ public class UserControllerTest {
             null,
             null,
             null,
-            null,
-            null,
-            null,
             Collections.emptyList(),
             Collections.emptyList()
         );

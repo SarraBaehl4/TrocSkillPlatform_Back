@@ -3,7 +3,6 @@ package RNCP.TrocSkillHub.Models;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -62,22 +61,12 @@ public class User {
         this.updatedAt = LocalDate.now();
     }
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Education> education;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Experience> experience;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Project> project;
-
     // Constructeur
     public User() {
     }
 
     public User(String firstName, String lastName,String avatar_id, String address, String country, String city, String phoneNumber,
-            String email, List<Education> education, List<Experience> experience,
-            List<Project> project) {
+            String email) {
 
         this.firstName = firstName;
         this.lastName = lastName;
@@ -87,9 +76,6 @@ public class User {
         this.city = city;
         this.phoneNumber = phoneNumber;
         this.email = email;
-        this.education = education;
-        this.experience = experience;
-        this.project = project;
     }
 
     // Getters
